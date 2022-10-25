@@ -8,7 +8,7 @@ import (
 
 	"github.com/go-chi/render"
 
-	"slobbo/src/types"
+	"github.com/younny/slobbo-backend/src/types"
 )
 
 const (

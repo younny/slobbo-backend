@@ -8,8 +8,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 
-	"slobbo/src/db"
-	"slobbo/src/types"
+	"github.com/younny/slobbo-backend/src/db"
+	"github.com/younny/slobbo-backend/src/types"
 )
 
 type (

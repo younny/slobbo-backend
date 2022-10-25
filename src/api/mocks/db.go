@@ -3,7 +3,7 @@ package mocks
 import (
 	reflect "reflect"
 
-	types "slobbo/src/types"
+	types "github.com/younny/slobbo-backend/src/types"
 
 	gomock "github.com/golang/mock/gomock"
 )

@@ -1,7 +1,7 @@
 package db
 
 import (
-	"slobbo/src/types"
+	"github.com/younny/slobbo-backend/src/types"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"

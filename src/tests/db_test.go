@@ -1,8 +1,9 @@
-package db
+package tests
 
 import (
-	"slobbo/src/types"
 	"testing"
+
+	"github.com/younny/slobbo-backend/src/types"
 )
 
 var (

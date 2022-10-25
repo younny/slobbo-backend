@@ -1,4 +1,4 @@
-package api
+package tests
 
 import (
 	"bytes"
@@ -15,8 +15,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 
-	"slobbo/src/api/mocks"
-	"slobbo/src/types"
+	"github.com/younny/slobbo-backend/src/api"
+	"github.com/younny/slobbo-backend/src/api/mocks"
+	"github.com/younny/slobbo-backend/src/types"
 )
 
 var randomTime = time.Date(1970, 1, 0, 0, 0, 0, 0, time.UTC)
@@ -57,7 +58,7 @@ type TestCase struct {
 
 func TestGetRouter(t *testing.T) {
 	log, _ := zap.NewProduction(zap.WithCaller(false))
-	r := GetRouter(log, nil)
+	r := api.GetRouter(log, nil)
 
 	testcases := map[string]struct {
 		method string
@@ -128,7 +129,7 @@ func getDBClientMock(t *testing.T) *mocks.MockClientInterface {
 }
 
 func TestEndpoints(t *testing.T) {
-	r := GetRouter(nil, getDBClientMock(t))
+	r := api.GetRouter(nil, getDBClientMock(t))
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 

@@ -1,4 +1,4 @@
-module slobbo
+module github.com/younny/slobbo-backend
 
 go 1.19
 
@@ -7,6 +7,7 @@ require (
 	github.com/go-chi/render v1.0.2
 	github.com/golang/mock v1.6.0
 	github.com/jinzhu/gorm v1.9.16
+	github.com/joho/godotenv v1.4.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.0
 	go.uber.org/zap v1.23.0
