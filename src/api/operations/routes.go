@@ -6,6 +6,16 @@ import (
 )
 
 func (s *Server) initializeRoutes() {
+	s.Router.Route("/workshops", func(r chi.Router) {
+		r.With(m.Pagination).Get("/", s.GetWorkshops)
+		r.Post("/", s.CreateWorkshop)
+		r.Route("/{id}", func(r chi.Router) {
+			r.Use(m.Workshop)
+			r.Get("/", GetWorkshop)
+			r.Patch("/", s.UpdateWorkshop)
+			r.Delete("/", s.DeleteWorkshop)
+		})
+	})
 	s.Router.Route("/posts", func(r chi.Router) {
 		r.With(m.Pagination).Get("/", s.GetPosts)
 		r.Post("/", s.CreatePost)

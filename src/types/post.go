@@ -36,15 +36,16 @@ func (p *PostList) Render(w http.ResponseWriter, r *http.Request) error {
 }
 
 type PostRequest struct {
-	Title     string `json:"title" gorm:"not null"`
-	SubTitle  string `json:"sub_title"`
-	Body      string `json:"body" gorm:"not null"`
-	Author    string `json:"author" gorm:"not null"`
+	Title     string `gorm:"size:255;not null" json:"title"`
+	SubTitle  string `gorm:"size:255" json:"sub_title"`
+	Body      string `gorm:"not null" json:"body"`
+	Author    string `gorm:"not null" json:"author"`
 	Category  uint   `json:"category"`
 	Thumbnail string `json:"thumbnail"`
 }
 
 func (p *PostRequest) Validate() error {
+
 	if p.Title == "" {
 		return errors.New("Title required")
 	}

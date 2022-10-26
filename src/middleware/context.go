@@ -17,7 +17,8 @@ type (
 )
 
 const (
-	PostCtxKey CustomKey = "post"
+	PostCtxKey     CustomKey = "post"
+	WorkshopCtxKey CustomKey = "workshop"
 )
 
 var DBClient db.ClientInterface
@@ -48,6 +49,31 @@ func Post(next http.Handler) http.Handler {
 		}
 
 		ctx := context.WithValue(r.Context(), PostCtxKey, post)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func Workshop(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var workshop *types.Workshop
+
+		if id := chi.URLParam(r, "id"); id != "" {
+			workshopID, err := strconv.Atoi(id)
+			if err != nil {
+				_ = render.Render(w, r, types.ErrInvalidRequst(err))
+			}
+			workshop = DBClient.GetWorkshopByID(uint(workshopID))
+		} else {
+			_ = render.Render(w, r, types.ErrNotFound())
+			return
+		}
+
+		if workshop == nil {
+			_ = render.Render(w, r, types.ErrNotFound())
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), WorkshopCtxKey, workshop)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
