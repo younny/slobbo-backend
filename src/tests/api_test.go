@@ -23,6 +23,17 @@ var randomTime = time.Date(1970, 1, 0, 0, 0, 0, 0, time.UTC)
 var randomDuration = time.Duration(20)
 
 var (
+	testContacts = types.Contacts{
+		Email:  "abc@example.com",
+		Github: "github.com/younny",
+	}
+	testAbout = types.About{
+		Title:    "About me",
+		SubTitle: "About me sub",
+		Body1:    "This is body 1",
+		Body2:    "This is body 2",
+		Contacts: &testContacts,
+	}
 	testPost1 = types.Post{
 		ID:        0,
 		Title:     "H",
@@ -91,6 +102,14 @@ func TestGetRouter(t *testing.T) {
 		method string
 		path   string
 	}{
+		"GET /about": {
+			method: http.MethodGet,
+			path:   "/about",
+		},
+		"PATCH /about": {
+			method: http.MethodPatch,
+			path:   "/about",
+		},
 		"GET /posts": {
 			method: http.MethodGet,
 			path:   "/posts",
@@ -144,6 +163,10 @@ func TestGetRouter(t *testing.T) {
 func getDBClientMock(t *testing.T) *mocks.MockClientInterface {
 	ctrl := gomock.NewController(t)
 	dbClient := mocks.NewMockClientInterface(ctrl)
+
+	dbClient.EXPECT().GetAbout().Return(&testAbout)
+
+	dbClient.EXPECT().UpdateAbout(gomock.Any()).AnyTimes()
 
 	dbClient.EXPECT().GetPosts(gomock.Eq(0)).Return(&types.PostList{
 		Items: []*types.Post{
@@ -210,6 +233,8 @@ func TestPostEndpoints(t *testing.T) {
 	defer ts.Close()
 
 	testcasesInOrder := []string{
+		"GET /about",
+		"PATCH /about",
 		"GET /posts",
 		"GET /posts?page_id=1",
 		"GET /posts/{id} 200",
@@ -228,6 +253,19 @@ func TestPostEndpoints(t *testing.T) {
 		"POST /workshops 400",
 	}
 	testcases := map[string]TestCase{
+		"GET /about": {
+			method:   http.MethodGet,
+			path:     "/about",
+			wantCode: http.StatusOK,
+			wantBody: `{"title":"About me","sub_title":"About me sub","body_1":"This is body 1","body_2":"This is body 2","contacts":{"email":"abc@example.com","github":"github.com/younny"}}`,
+		},
+		"PATCH /about": {
+			method:   http.MethodPatch,
+			path:     "/about",
+			body:     `{"title":"About me !!!"}`,
+			wantCode: http.StatusOK,
+			wantBody: `{"title":"About me !!!","sub_title":"About me sub","body_1":"This is body 1","body_2":"This is body 2","contacts":{"email":"abc@example.com","github":"github.com/younny"}}`,
+		},
 		"GET /posts": {
 			method:   http.MethodGet,
 			path:     "/posts",

@@ -16,6 +16,9 @@ type ClientInterface interface {
 	Ping() error
 	Connect(connectionString string) error
 
+	GetAbout() *types.About
+	UpdateAbout(about *types.About) error
+
 	GetPosts(pageID int) *types.PostList
 	GetPostByID(id uint) *types.Post
 	CreatePost(post *types.Post) error
@@ -51,6 +54,7 @@ func (c *Client) Connect(connectionString string) error {
 }
 
 func (c *Client) autoMigrate() {
+	c.Client.AutoMigrate(&types.About{})
 	c.Client.AutoMigrate(&types.Post{})
 	c.Client.AutoMigrate(&types.Workshop{})
 }

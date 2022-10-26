@@ -170,3 +170,27 @@ func (mr *MockClientInterfaceMockRecorder) DeleteWorkshop(arg0 interface{}) *gom
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteWorkshop", reflect.TypeOf((*MockClientInterface)(nil).DeleteWorkshop), arg0)
 }
+
+func (m *MockClientInterface) GetAbout() *types.About {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAbout")
+	ret0, _ := ret[0].(*types.About)
+	return ret0
+}
+
+func (mr *MockClientInterfaceMockRecorder) GetAbout() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAbout", reflect.TypeOf((*MockClientInterface)(nil).GetAbout))
+}
+
+func (m *MockClientInterface) UpdateAbout(arg0 *types.About) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateAbout")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (mr *MockClientInterfaceMockRecorder) UpdateAbout(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAbout", reflect.TypeOf((*MockClientInterface)(nil).UpdateAbout), arg0)
+}
