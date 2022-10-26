@@ -14,7 +14,7 @@ import (
 )
 
 type Server struct {
-	DB     *db.Client
+	DB     db.ClientInterface
 	Router *chi.Mux
 }
 
@@ -25,27 +25,26 @@ func (server *Server) Initialize(DbUri string) {
 		l.Log.Error("Couldn't connect to database", zap.Error(err))
 		os.Exit(1)
 	}
+	server.Set(dbClient)
 }
 
 func (server *Server) Run(addr string) {
-	dbClient := &db.Client{}
-
-	r := GetRouter(dbClient)
-	server.DB = dbClient
-	server.Router = r
-	m.SetDBClient(dbClient)
-
-	server.initializeRoutes()
-
 	go func() {
-		if err := http.ListenAndServe(addr, r); err != nil {
+		if err := http.ListenAndServe(addr, server.Router); err != nil {
 			l.Log.Error("Failed to start server", zap.Error(err))
 			return
 		}
 	}()
 }
 
-func GetRouter(dbClient db.ClientInterface) *chi.Mux {
+func (server *Server) Set(dbClient db.ClientInterface) {
+	server.Router = getRouter()
+	server.DB = dbClient
+	m.SetDBClient(dbClient)
+	server.initializeRoutes()
+}
+
+func getRouter() *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)

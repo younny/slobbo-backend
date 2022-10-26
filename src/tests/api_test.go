@@ -13,10 +13,9 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/zap"
 
-	"github.com/younny/slobbo-backend/src/api"
 	"github.com/younny/slobbo-backend/src/api/mocks"
+	"github.com/younny/slobbo-backend/src/api/operations"
 	"github.com/younny/slobbo-backend/src/types"
 )
 
@@ -57,9 +56,9 @@ type TestCase struct {
 }
 
 func TestGetRouter(t *testing.T) {
-	log, _ := zap.NewProduction(zap.WithCaller(false))
-	r := api.GetRouter(log, nil)
-
+	server := operations.Server{}
+	server.Set(nil)
+	r := server.Router
 	testcases := map[string]struct {
 		method string
 		path   string
@@ -129,18 +128,21 @@ func getDBClientMock(t *testing.T) *mocks.MockClientInterface {
 }
 
 func TestEndpoints(t *testing.T) {
-	r := api.GetRouter(nil, getDBClientMock(t))
-	ts := httptest.NewServer(r)
+	s := operations.Server{}
+	s.Set(getDBClientMock(t))
+
+	ts := httptest.NewServer(s.Router)
 	defer ts.Close()
 
 	testcasesInOrder := []string{
 		"GET /posts",
 		"GET /posts?page_id=1",
 		"GET /posts/{id} 200",
-		"POST /posts",
+		"POST /posts 200",
 		"PATCH /posts",
 		"DELETE /posts",
 		"GET /posts/{id} 404",
+		"POST /posts 400",
 	}
 	testcases := map[string]TestCase{
 		"GET /posts": {
@@ -161,7 +163,7 @@ func TestEndpoints(t *testing.T) {
 			wantCode: http.StatusOK,
 			wantBody: `{"id":0,"title":"H","sub_title":"S","body":"B","author":"Koo","category":1,"thumbnail":"w","createdAt":"1969-12-31T00:00:00Z","updatedAt":"1969-12-31T00:00:00Z"}`,
 		},
-		"POST /posts": {
+		"POST /posts 200": {
 			method: http.MethodPost,
 			path:   "/posts",
 			body:   `{"title":"Hello","sub_title":"S","body":"B","author":"Koo","category":0,"thumbnail":"w"}`,
@@ -193,6 +195,15 @@ func TestEndpoints(t *testing.T) {
 			method:   http.MethodGet,
 			path:     "/posts/3",
 			wantCode: http.StatusNotFound,
+		},
+		"POST /posts 400": {
+			method: http.MethodPost,
+			path:   "/posts",
+			body:   `{"title":"","sub_title":"S","body":"B","author":"Koo","category":0,"thumbnail":"w"}`,
+			header: map[string][]string{
+				"Content-type": {"application/json"},
+			},
+			wantCode: http.StatusBadRequest,
 		},
 	}
 
