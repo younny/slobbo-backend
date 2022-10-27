@@ -40,14 +40,14 @@ func (server *Server) CreateWorkshop(w http.ResponseWriter, r *http.Request) {
 	}
 
 	newWorkshop := types.Workshop{
-		Name:      workshopRequest.Name,
-		Details:   workshopRequest.Details,
-		Organiser: workshopRequest.Organiser,
-		Location:  workshopRequest.Location,
-		Datetime:  workshopRequest.Datetime,
-		Duration:  workshopRequest.Duration,
-		Capacity:  workshopRequest.Capacity,
-		Price:     workshopRequest.Price,
+		Name:        workshopRequest.Name,
+		Description: workshopRequest.Description,
+		Organiser:   workshopRequest.Organiser,
+		Location:    workshopRequest.Location,
+		Duration:    workshopRequest.Duration,
+		Capacity:    workshopRequest.Capacity,
+		Price:       workshopRequest.Price,
+		Thumbnail:   workshopRequest.Thumbnail,
 	}
 
 	if err := server.DB.CreateWorkshop(&newWorkshop); err != nil {

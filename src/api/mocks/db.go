@@ -51,6 +51,30 @@ func (mr *MockClientInterfaceMockRecorder) Ping(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockClientInterface)(nil).Ping), arg0)
 }
 
+func (m *MockClientInterface) DropTable(arg0 ...interface{}) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DropTable", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (mr *MockClientInterfaceMockRecorder) DropTable(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DropTable", reflect.TypeOf((*MockClientInterface)(nil).DropTable), arg0)
+}
+
+func (m *MockClientInterface) AutoMigrate(arg0 ...interface{}) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AutoMigrate", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (mr *MockClientInterfaceMockRecorder) AutoMigrate(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AutoMigrate", reflect.TypeOf((*MockClientInterface)(nil).AutoMigrate), arg0)
+}
+
 func (m *MockClientInterface) GetPosts(arg0 int) *types.PostList {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPosts", arg0)

@@ -15,6 +15,8 @@ const (
 type ClientInterface interface {
 	Ping() error
 	Connect(connectionString string) error
+	DropTable(arg0 ...interface{}) error
+	AutoMigrate(arg0 ...interface{}) error
 
 	GetAbout() *types.About
 	UpdateAbout(about *types.About) error
@@ -49,12 +51,14 @@ func (c *Client) Connect(connectionString string) error {
 		return err
 	}
 	c.Client.LogMode(false)
-	c.autoMigrate()
+	c.AutoMigrate(&types.About{}, &types.Post{}, &types.Workshop{})
 	return nil
 }
 
-func (c *Client) autoMigrate() {
-	c.Client.AutoMigrate(&types.About{})
-	c.Client.AutoMigrate(&types.Post{})
-	c.Client.AutoMigrate(&types.Workshop{})
+func (c *Client) DropTable(arg0 ...interface{}) error {
+	return c.Client.DropTableIfExists(arg0...).Error
+}
+
+func (c *Client) AutoMigrate(arg0 ...interface{}) error {
+	return c.Client.AutoMigrate(arg0...).Error
 }
