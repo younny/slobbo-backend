@@ -160,72 +160,7 @@ func TestGetRouter(t *testing.T) {
 	}
 }
 
-func getDBClientMock(t *testing.T) *mocks.MockClientInterface {
-	ctrl := gomock.NewController(t)
-	dbClient := mocks.NewMockClientInterface(ctrl)
-
-	dbClient.EXPECT().GetAbout().Return(&testAbout)
-
-	dbClient.EXPECT().UpdateAbout(gomock.Any()).AnyTimes()
-
-	dbClient.EXPECT().GetPosts(gomock.Eq(0)).Return(&types.PostList{
-		Items: []*types.Post{
-			&testPost1,
-			&testPost2,
-		},
-	})
-	dbClient.EXPECT().GetPosts(gomock.Eq(1)).Return(&types.PostList{
-		Items: []*types.Post{
-			&testPost2,
-		},
-	})
-
-	dbClient.EXPECT().GetPostByID(gomock.Eq(uint(0))).Return(&testPost1).AnyTimes()
-
-	dbClient.EXPECT().GetPostByID(gomock.Eq(uint(1))).Return(&testPost2).AnyTimes()
-
-	dbClient.EXPECT().GetPostByID(gomock.Eq(uint(3))).Return(nil).AnyTimes()
-
-	dbClient.EXPECT().CreatePost(gomock.Any()).DoAndReturn(func(post *types.Post) error {
-		post.ID = 3
-		return nil
-	}).AnyTimes()
-
-	dbClient.EXPECT().UpdatePost(gomock.Any()).AnyTimes()
-
-	dbClient.EXPECT().DeletePost(gomock.Eq(uint(1))).AnyTimes()
-
-	dbClient.EXPECT().GetWorkshops(gomock.Eq(0)).Return(&types.WorkshopList{
-		Items: []*types.Workshop{
-			&testWorkshop1,
-			&testWorkshop2,
-		},
-	})
-	dbClient.EXPECT().GetWorkshops(gomock.Eq(1)).Return(&types.WorkshopList{
-		Items: []*types.Workshop{
-			&testWorkshop2,
-		},
-	})
-
-	dbClient.EXPECT().GetWorkshopByID(gomock.Eq(uint(0))).Return(&testWorkshop1).AnyTimes()
-
-	dbClient.EXPECT().GetWorkshopByID(gomock.Eq(uint(1))).Return(&testWorkshop2).AnyTimes()
-
-	dbClient.EXPECT().GetWorkshopByID(gomock.Eq(uint(3))).Return(nil).AnyTimes()
-
-	dbClient.EXPECT().CreateWorkshop(gomock.Any()).DoAndReturn(func(workshop *types.Workshop) error {
-		workshop.ID = 3
-		return nil
-	}).AnyTimes()
-
-	dbClient.EXPECT().UpdateWorkshop(gomock.Any()).AnyTimes()
-
-	dbClient.EXPECT().DeleteWorkshop(gomock.Eq(uint(1))).AnyTimes()
-
-	return dbClient
-}
-
-func TestPostEndpoints(t *testing.T) {
+func TestEndpoints(t *testing.T) {
 	s := operations.Server{}
 	s.Set(getDBClientMock(t))
 
@@ -257,14 +192,17 @@ func TestPostEndpoints(t *testing.T) {
 			method:   http.MethodGet,
 			path:     "/about",
 			wantCode: http.StatusOK,
-			wantBody: `{"title":"About me","sub_title":"About me sub","body_1":"This is body 1","body_2":"This is body 2","contacts":{"email":"abc@example.com","github":"github.com/younny"}}`,
+			wantBody: `{"id":0,"title":"About me","sub_title":"About me sub","body_1":"This is body 1","body_2":"This is body 2","contacts":{"email":"abc@example.com","github":"github.com/younny"}}`,
 		},
 		"PATCH /about": {
-			method:   http.MethodPatch,
-			path:     "/about",
-			body:     `{"title":"About me !!!"}`,
+			method: http.MethodPatch,
+			path:   "/about",
+			body:   `{"title":"About me !!!"}`,
+			header: map[string][]string{
+				"Content-type": {"application/json"},
+			},
 			wantCode: http.StatusOK,
-			wantBody: `{"title":"About me !!!","sub_title":"About me sub","body_1":"This is body 1","body_2":"This is body 2","contacts":{"email":"abc@example.com","github":"github.com/younny"}}`,
+			wantBody: `{"id":0,"title":"About me !!!","sub_title":"About me sub","body_1":"This is body 1","body_2":"This is body 2","contacts":{"email":"abc@example.com","github":"github.com/younny"}}`,
 		},
 		"GET /posts": {
 			method:   http.MethodGet,
@@ -357,105 +295,12 @@ func TestPostEndpoints(t *testing.T) {
 		"PATCH /workshops": {
 			method: http.MethodPatch,
 			path:   "/workshops/0",
-			body:   `{"name":"Workshop 4"}`,
+			body:   `{"name":"Hello World"}`,
 			header: map[string][]string{
 				"Content-type": {"application/json"},
 			},
 			wantCode: http.StatusOK,
-			wantBody: `{"id":0,"name":"Workshop 4","details":"ABC","organiser":"f","location":"f","datetime":"1969-12-31T00:00:00Z","duration":20,"capacity":2,"price":"free","createdAt":"1969-12-31T00:00:00Z","updatedAt":"1969-12-31T00:00:00Z"}`,
-		},
-		"DELETE /workshops": {
-			method: http.MethodDelete,
-			path:   "/workshops/1",
-			header: map[string][]string{
-				"Content-type": {"application/json"},
-			},
-			wantCode: http.StatusOK,
-		},
-		"GET /workshops/{id} 404": {
-			method:   http.MethodGet,
-			path:     "/posts/3",
-			wantCode: http.StatusNotFound,
-		},
-		"POST /workshops 400": {
-			method: http.MethodPost,
-			path:   "/workshops",
-			body:   `{"name":"","details":"ABC","organiser":"f","location":"f","datetime":"1969-12-31T00:00:00Z","duration":20,"capacity":2,"price":"free","createdAt":"1969-12-31T00:00:00Z","updatedAt":"1969-12-31T00:00:00Z"}`,
-			header: map[string][]string{
-				"Content-type": {"application/json"},
-			},
-			wantCode: http.StatusBadRequest,
-		},
-	}
-
-	for _, name := range testcasesInOrder {
-		test := testcases[name]
-		t.Run(name, func(t *testing.T) {
-			body := bytes.NewReader([]byte(test.body))
-			gotResponse, gotBody := testRequest(t, ts, test.method, test.path, body, test.header)
-			assert.Equal(t, test.wantCode, gotResponse.StatusCode)
-			if test.wantBody != "" {
-				assert.Equal(t, test.wantBody, gotBody, "Body did not match")
-			}
-		})
-	}
-}
-
-func TestWorkshopEndpoints(t *testing.T) {
-	s := operations.Server{}
-	s.Set(getDBClientMock(t))
-
-	ts := httptest.NewServer(s.Router)
-	defer ts.Close()
-
-	testcasesInOrder := []string{
-		"GET /workshops",
-		"GET /workshops?page_id=1",
-		"GET /workshops/{id} 200",
-		"POST /workshops 200",
-		"PATCH /workshops",
-		"DELETE /workshops",
-		"GET /workshops/{id} 404",
-		"POST /workshops 400",
-	}
-	testcases := map[string]TestCase{
-		"GET /workshops": {
-			method:   http.MethodGet,
-			path:     "/workshops",
-			wantCode: http.StatusOK,
-			wantBody: `{"items":[{"id":0,"title":"H","sub_title":"S","body":"B","author":"Koo","category":1,"thumbnail":"w","createdAt":"1969-12-31T00:00:00Z","updatedAt":"1969-12-31T00:00:00Z"},{"id":1,"title":"H","sub_title":"S","body":"B","author":"Koo","category":0,"thumbnail":"w","createdAt":"1969-12-31T00:00:00Z","updatedAt":"1969-12-31T00:00:00Z"}]}`,
-		},
-		"GET /workshops?page_id=1": {
-			method:   http.MethodGet,
-			path:     "/workshops?page_id=1",
-			wantCode: http.StatusOK,
-			wantBody: `{"items":[{"id":1,"title":"H","sub_title":"S","body":"B","author":"Koo","category":0,"thumbnail":"w","createdAt":"1969-12-31T00:00:00Z","updatedAt":"1969-12-31T00:00:00Z"}]}`,
-		},
-		"GET /workshops/{id} 200": {
-			method:   http.MethodGet,
-			path:     "/workshops/0",
-			wantCode: http.StatusOK,
-			wantBody: `{"id":0,"title":"H","sub_title":"S","body":"B","author":"Koo","category":1,"thumbnail":"w","createdAt":"1969-12-31T00:00:00Z","updatedAt":"1969-12-31T00:00:00Z"}`,
-		},
-		"POST /workshops 200": {
-			method: http.MethodPost,
-			path:   "/workshops",
-			body:   `{"title":"Hello","sub_title":"S","body":"B","author":"Koo","category":0,"thumbnail":"w"}`,
-			header: map[string][]string{
-				"Content-type": {"application/json"},
-			},
-			wantCode: http.StatusOK,
-			wantBody: `{"id":3,"title":"Hello","sub_title":"S","body":"B","author":"Koo","category":0,"thumbnail":"w","createdAt":"0001-01-01T00:00:00Z","updatedAt":"0001-01-01T00:00:00Z"}`,
-		},
-		"PATCH /workshops": {
-			method: http.MethodPatch,
-			path:   "/workshops/0",
-			body:   `{"sub_title":"Hello World"}`,
-			header: map[string][]string{
-				"Content-type": {"application/json"},
-			},
-			wantCode: http.StatusOK,
-			wantBody: `{"id":0,"title":"H","sub_title":"Hello World","body":"B","author":"Koo","category":1,"thumbnail":"w","createdAt":"1969-12-31T00:00:00Z","updatedAt":"1969-12-31T00:00:00Z"}`,
+			wantBody: `{"id":0,"name":"Hello World","details":"ABC","organiser":"f","location":"f","datetime":"1969-12-31T00:00:00Z","duration":20,"capacity":2,"price":"free","createdAt":"1969-12-31T00:00:00Z","updatedAt":"1969-12-31T00:00:00Z"}`,
 		},
 		"DELETE /workshops": {
 			method: http.MethodDelete,
@@ -492,6 +337,71 @@ func TestWorkshopEndpoints(t *testing.T) {
 			}
 		})
 	}
+}
+
+func getDBClientMock(t *testing.T) *mocks.MockClientInterface {
+	ctrl := gomock.NewController(t)
+	dbClient := mocks.NewMockClientInterface(ctrl)
+
+	dbClient.EXPECT().GetAbout().Return(&testAbout).Times(2)
+
+	dbClient.EXPECT().UpdateAbout(gomock.Any()).AnyTimes()
+
+	dbClient.EXPECT().GetPosts(gomock.Eq(0)).Return(&types.PostList{
+		Items: []*types.Post{
+			&testPost1,
+			&testPost2,
+		},
+	})
+	dbClient.EXPECT().GetPosts(gomock.Eq(1)).Return(&types.PostList{
+		Items: []*types.Post{
+			&testPost2,
+		},
+	})
+
+	dbClient.EXPECT().GetPostByID(gomock.Eq(uint(0))).Return(&testPost1).AnyTimes()
+
+	dbClient.EXPECT().GetPostByID(gomock.Eq(uint(1))).Return(&testPost2).AnyTimes()
+
+	dbClient.EXPECT().GetPostByID(gomock.Eq(uint(3))).Return(nil).AnyTimes()
+
+	dbClient.EXPECT().CreatePost(gomock.Any()).DoAndReturn(func(post *types.Post) error {
+		post.ID = 3
+		return nil
+	}).AnyTimes()
+
+	dbClient.EXPECT().UpdatePost(gomock.Any()).AnyTimes()
+
+	dbClient.EXPECT().DeletePost(gomock.Eq(uint(1))).AnyTimes()
+
+	dbClient.EXPECT().GetWorkshops(gomock.Eq(0)).Return(&types.WorkshopList{
+		Items: []*types.Workshop{
+			&testWorkshop1,
+			&testWorkshop2,
+		},
+	}).AnyTimes()
+	dbClient.EXPECT().GetWorkshops(gomock.Eq(1)).Return(&types.WorkshopList{
+		Items: []*types.Workshop{
+			&testWorkshop2,
+		},
+	}).AnyTimes()
+
+	dbClient.EXPECT().GetWorkshopByID(gomock.Eq(uint(0))).Return(&testWorkshop1).AnyTimes()
+
+	dbClient.EXPECT().GetWorkshopByID(gomock.Eq(uint(1))).Return(&testWorkshop2).AnyTimes()
+
+	dbClient.EXPECT().GetWorkshopByID(gomock.Eq(uint(3))).Return(nil).AnyTimes()
+
+	dbClient.EXPECT().CreateWorkshop(gomock.Any()).DoAndReturn(func(workshop *types.Workshop) error {
+		workshop.ID = 3
+		return nil
+	}).AnyTimes()
+
+	dbClient.EXPECT().UpdateWorkshop(gomock.Any()).AnyTimes()
+
+	dbClient.EXPECT().DeleteWorkshop(gomock.Eq(uint(1))).AnyTimes()
+
+	return dbClient
 }
 
 func testRequest(t *testing.T, ts *httptest.Server, method, path string, body io.Reader, header http.Header) (*http.Response, string) {

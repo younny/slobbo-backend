@@ -15,7 +15,11 @@ func (server *Server) GetAbout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) UpdateAbout(w http.ResponseWriter, r *http.Request) {
-	about := &types.About{}
+	about := server.DB.GetAbout()
+	if about == nil {
+		_ = render.Render(w, r, types.ErrNotFound())
+		return
+	}
 
 	if err := render.Bind(r, about); err != nil {
 		_ = render.Render(w, r, types.ErrInvalidRequst(err))

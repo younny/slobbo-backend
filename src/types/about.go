@@ -3,6 +3,7 @@ package types
 import "net/http"
 
 type About struct {
+	ID       uint      `json:"id" gorm:"primaryKey"`
 	Title    string    `gorm:"not null" json:"title"`
 	SubTitle string    `json:"sub_title"`
 	Body1    string    `json:"body_1"`

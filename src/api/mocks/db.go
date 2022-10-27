@@ -185,7 +185,7 @@ func (mr *MockClientInterfaceMockRecorder) GetAbout() *gomock.Call {
 
 func (m *MockClientInterface) UpdateAbout(arg0 *types.About) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateAbout")
+	ret := m.ctrl.Call(m, "UpdateAbout", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
