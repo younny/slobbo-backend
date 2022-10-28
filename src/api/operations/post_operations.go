@@ -27,33 +27,24 @@ func GetPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) CreatePost(w http.ResponseWriter, r *http.Request) {
-	postRequest := &types.PostRequest{}
+	post := &types.Post{}
 
-	if err := render.Bind(r, postRequest); err != nil {
+	if err := render.Bind(r, post); err != nil {
 		_ = render.Render(w, r, types.ErrInvalidRequst(err))
 		return
 	}
 
-	if err := postRequest.Validate(); err != nil {
+	if err := post.Validate(); err != nil {
 		_ = render.Render(w, r, types.ErrInvalidRequst(err))
 		return
 	}
 
-	newPost := types.Post{
-		Title:     postRequest.Title,
-		SubTitle:  postRequest.SubTitle,
-		Body:      postRequest.Body,
-		Author:    postRequest.Author,
-		Category:  postRequest.Category,
-		Thumbnail: postRequest.Thumbnail,
-	}
-
-	if err := server.DB.CreatePost(&newPost); err != nil {
+	if err := server.DB.CreatePost(post); err != nil {
 		_ = render.Render(w, r, types.ErrInvalidRequst(err))
 		return
 	}
 
-	if err := render.Render(w, r, &newPost); err != nil {
+	if err := render.Render(w, r, post); err != nil {
 		_ = render.Render(w, r, types.ErrRender(err))
 		return
 	}

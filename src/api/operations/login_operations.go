@@ -24,19 +24,25 @@ func (server *Server) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// todo token
+	token, err := server.SignIn(user.Email, user.Password)
 
+	if err != nil {
+		_ = render.Render(w, r, types.ErrInvalidRequst(err))
+		return
+	}
+
+	render.Render(w, r, &types.TokenResponse{Token: token})
 }
 
-func (server *Server) Signin(email, password string) error {
+func (server *Server) SignIn(email, password string) (string, error) {
 	user := server.DB.GetUserByEmail(email)
 
 	if user == nil {
-		return errors.New("User not found")
+		return "", errors.New("User not found")
 	}
 
 	if err := types.VerifyPassword(user.Password, password); err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		return err
+		return "", err
 	}
 
 	return auth.CreateToken(user.ID)

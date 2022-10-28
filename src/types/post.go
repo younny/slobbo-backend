@@ -26,25 +26,7 @@ func (p *Post) Bind(r *http.Request) error {
 	return nil
 }
 
-type PostList struct {
-	Items      []*Post `json:"items"`
-	NextPageID uint    `json:"next_page_id,omitempty"`
-}
-
-func (p *PostList) Render(w http.ResponseWriter, r *http.Request) error {
-	return nil
-}
-
-type PostRequest struct {
-	Title     string `gorm:"size:255;not null" json:"title"`
-	SubTitle  string `gorm:"size:255" json:"sub_title"`
-	Body      string `gorm:"not null" json:"body"`
-	Author    string `gorm:"not null" json:"author"`
-	Category  uint   `json:"category"`
-	Thumbnail string `json:"thumbnail"`
-}
-
-func (p *PostRequest) Validate() error {
+func (p *Post) Validate() error {
 
 	if p.Title == "" {
 		return errors.New("Title required")
@@ -58,10 +40,11 @@ func (p *PostRequest) Validate() error {
 	return nil
 }
 
-func (p *PostRequest) Render(w http.ResponseWriter, r *http.Request) error {
-	return nil
+type PostList struct {
+	Items      []*Post `json:"items"`
+	NextPageID uint    `json:"next_page_id,omitempty"`
 }
 
-func (p *PostRequest) Bind(r *http.Request) error {
+func (p *PostList) Render(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }

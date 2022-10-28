@@ -1,11 +1,13 @@
 package db
 
-import "github.com/younny/slobbo-backend/src/types"
+import (
+	"github.com/younny/slobbo-backend/src/types"
+)
 
 func (c *Client) GetUsers() *types.UserList {
 	users := &types.UserList{}
 
-	if err := c.Client.Find(&users).Error; err != nil {
+	if err := c.Client.Find(&users.Items).Error; err != nil {
 		return nil
 	}
 

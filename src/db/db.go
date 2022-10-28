@@ -58,7 +58,7 @@ func (c *Client) Connect(connectionString string) error {
 		return err
 	}
 	c.Client.LogMode(false)
-	c.AutoMigrate(&types.About{}, &types.Post{}, &types.Workshop{})
+	c.AutoMigrate(&types.User{}, &types.About{}, &types.Post{}, &types.Workshop{})
 	return nil
 }
 
