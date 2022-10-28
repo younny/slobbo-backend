@@ -6,6 +6,19 @@ import (
 )
 
 func (s *Server) initializeRoutes() {
+	s.Router.Route("/login", func(r chi.Router) {
+		r.Post("/", s.Login)
+	})
+	s.Router.Route("/users", func(r chi.Router) {
+		r.Get("/", s.GetUsers)
+		r.Post("/", s.CreateUser)
+		r.Route("/{id}", func(r chi.Router) {
+			r.Use(m.User)
+			r.Get("/", GetUserByID)
+			r.Patch("/", s.UpdateUser)
+			r.Delete("/", s.DeleteUser)
+		})
+	})
 	s.Router.Route("/about", func(r chi.Router) {
 		r.Get("/", s.GetAbout)
 		r.Patch("/", s.UpdateAbout)

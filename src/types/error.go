@@ -43,3 +43,12 @@ func ErrNotFound() render.Renderer {
 		StatusText:     "Resources not found.",
 	}
 }
+
+func ErrNotAuthorised(err error) render.Renderer {
+	return &ErrResponse{
+		Err:            err,
+		HttpStatusCode: http.StatusUnauthorized,
+		StatusText:     "Not authorised.",
+		ErrorText:      err.Error(),
+	}
+}

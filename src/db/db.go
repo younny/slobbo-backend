@@ -18,6 +18,13 @@ type ClientInterface interface {
 	DropTable(arg0 ...interface{}) error
 	AutoMigrate(arg0 ...interface{}) error
 
+	GetUsers() *types.UserList
+	GetUserByID(id uint) *types.User
+	GetUserByEmail(email string) *types.User
+	CreateUser(user *types.User) error
+	UpdateUser(user *types.User) error
+	DeleteUser(id uint) error
+
 	GetAbout() *types.About
 	UpdateAbout(about *types.About) error
 

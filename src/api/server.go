@@ -36,7 +36,7 @@ func Run() {
 		os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_USER"), os.Getenv("DB_NAME"), os.Getenv("DB_PASSWORD"))
 
 	server.Initialize(dbUri)
-	//seed
+
 	server.Run(addr)
 
 	l.Log.Info("Ready to serve reqeusts on " + addr)

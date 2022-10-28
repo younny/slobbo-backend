@@ -218,3 +218,75 @@ func (mr *MockClientInterfaceMockRecorder) UpdateAbout(arg0 interface{}) *gomock
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAbout", reflect.TypeOf((*MockClientInterface)(nil).UpdateAbout), arg0)
 }
+
+func (m *MockClientInterface) GetUsers() *types.UserList {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUsers")
+	ret0, _ := ret[0].(*types.UserList)
+	return ret0
+}
+
+func (mr *MockClientInterfaceMockRecorder) GetUsers() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUsers", reflect.TypeOf((*MockClientInterface)(nil).GetUsers))
+}
+
+func (m *MockClientInterface) GetUserByID(arg0 uint) *types.User {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserByID", arg0)
+	ret0, _ := ret[0].(*types.User)
+	return ret0
+}
+
+func (mr *MockClientInterfaceMockRecorder) GetUserByID(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByID", reflect.TypeOf((*MockClientInterface)(nil).GetUserByID), arg0)
+}
+
+func (m *MockClientInterface) GetUserByEmail(arg0 string) *types.User {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserByEmail", arg0)
+	ret0, _ := ret[0].(*types.User)
+	return ret0
+}
+
+func (mr *MockClientInterfaceMockRecorder) GetUserByEmail(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByEmail", reflect.TypeOf((*MockClientInterface)(nil).GetUserByEmail), arg0)
+}
+
+func (m *MockClientInterface) CreateUser(arg0 *types.User) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateUser", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (mr *MockClientInterfaceMockRecorder) CreateUser(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockClientInterface)(nil).CreateUser), arg0)
+}
+
+func (m *MockClientInterface) UpdateUser(arg0 *types.User) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateUser", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (mr *MockClientInterfaceMockRecorder) UpdateUser(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUser", reflect.TypeOf((*MockClientInterface)(nil).UpdateUser), arg0)
+}
+
+func (m *MockClientInterface) DeleteUser(arg0 uint) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteUser", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (mr *MockClientInterfaceMockRecorder) DeleteUser(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockClientInterface)(nil).DeleteUser), arg0)
+}
