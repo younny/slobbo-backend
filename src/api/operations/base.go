@@ -3,6 +3,7 @@ package operations
 import (
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -48,10 +49,10 @@ func getRouter() *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
-
-	if l.Log != nil {
-		r.Use(m.SetLogger(l.Log))
-	}
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.RealIP)
+	r.Use(middleware.Logger)
+	r.Use(middleware.Timeout(60 * time.Second))
 
 	return r
 }

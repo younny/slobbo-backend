@@ -2,6 +2,8 @@ package api_tests
 
 import (
 	"bytes"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -25,6 +27,32 @@ var (
 			Github: "github.com/younny",
 		},
 	}
+
+	updateTestAbout = types.About{
+		Title:    "About you",
+		SubTitle: "About me sub",
+		Body1:    "This is body 1",
+		Body2:    "This is body 2",
+		Contacts: &types.Contacts{
+			Email:  "abc@example.com",
+			Github: "github.com/younny",
+		},
+	}
+
+	updateResultTestAbout = types.About{
+		Title:    "About you",
+		SubTitle: "About me sub",
+		Body1:    "This is body 1",
+		Body2:    "This is body 2",
+		Contacts: &types.Contacts{
+			Email:  "abc@example.com",
+			Github: "github.com/younny",
+		},
+	}
+
+	testAboutInJson, _             = json.Marshal(testAbout)
+	updateTestAboutInJson, _       = json.Marshal(updateTestAbout)
+	updateResultTestAboutInJson, _ = json.Marshal(updateResultTestAbout)
 )
 
 func TestAboutEndpoints(t *testing.T) {
@@ -43,17 +71,17 @@ func TestAboutEndpoints(t *testing.T) {
 			method:   http.MethodGet,
 			path:     "/about",
 			wantCode: http.StatusOK,
-			wantBody: `{"id":0,"title":"About me","sub_title":"About me sub","body_1":"This is body 1","body_2":"This is body 2","contacts":{"email":"abc@example.com","github":"github.com/younny"}}`,
+			wantBody: fmt.Sprintf(`%s`, testAboutInJson),
 		},
 		"PATCH /about": {
 			method: http.MethodPatch,
 			path:   "/about",
-			body:   `{"title":"About me !!!"}`,
-			header: map[string][]string{
+			header: http.Header{
 				"Content-type": {"application/json"},
 			},
+			body:     fmt.Sprintf(`%s`, updateTestAboutInJson),
 			wantCode: http.StatusOK,
-			wantBody: `{"id":0,"title":"About me !!!","sub_title":"About me sub","body_1":"This is body 1","body_2":"This is body 2","contacts":{"email":"abc@example.com","github":"github.com/younny"}}`,
+			wantBody: fmt.Sprintf(`%s`, updateResultTestAboutInJson),
 		},
 	}
 

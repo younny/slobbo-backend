@@ -2,6 +2,8 @@ package api_tests
 
 import (
 	"bytes"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -37,6 +39,66 @@ var (
 		CreatedAt: randomTime,
 		UpdatedAt: randomTime,
 	}
+
+	newPost = types.Post{
+		Title:     "New Post",
+		SubTitle:  "New Post Sub",
+		Body:      "Boo",
+		Author:    "Koo",
+		Category:  0,
+		Thumbnail: "www",
+	}
+
+	newPostResponse = types.Post{
+		ID:        3,
+		Title:     "New Post",
+		SubTitle:  "New Post Sub",
+		Body:      "Boo",
+		Author:    "Koo",
+		Category:  0,
+		Thumbnail: "www",
+		CreatedAt: createdTime,
+		UpdatedAt: createdTime,
+	}
+
+	updatePost = types.Post{
+		ID:        0,
+		Title:     "This title is updated",
+		SubTitle:  "S",
+		Body:      "B",
+		Author:    "Koo",
+		Category:  1,
+		Thumbnail: "w",
+	}
+
+	updatePostResponse = types.Post{
+		ID:        0,
+		Title:     "This title is updated",
+		SubTitle:  "S",
+		Body:      "B",
+		Author:    "Koo",
+		Category:  1,
+		Thumbnail: "w",
+		CreatedAt: createdTime,
+		UpdatedAt: createdTime,
+	}
+
+	emptyTitlePost = types.Post{
+		Title:     "",
+		SubTitle:  "S",
+		Body:      "B",
+		Author:    "Koo",
+		Category:  1,
+		Thumbnail: "w",
+	}
+
+	testPost1Json, _          = json.Marshal(testPost1)
+	testPost2Json, _          = json.Marshal(testPost2)
+	newPostInJson, _          = json.Marshal(newPost)
+	newPostResponseJson, _    = json.Marshal(newPostResponse)
+	updatePostJson, _         = json.Marshal(updatePost)
+	updatePostResponseJson, _ = json.Marshal(updatePostResponse)
+	emptyTitlePostJson, _     = json.Marshal(emptyTitlePost)
 )
 
 func TestPostEndpoints(t *testing.T) {
@@ -51,7 +113,7 @@ func TestPostEndpoints(t *testing.T) {
 		"GET /posts?page_id=1",
 		"GET /posts/{id} 200",
 		"POST /posts 200",
-		"PATCH /posts",
+		"PATCH /posts/{id}",
 		"DELETE /posts",
 		"GET /posts/{id} 404",
 		"POST /posts 400",
@@ -61,44 +123,44 @@ func TestPostEndpoints(t *testing.T) {
 			method:   http.MethodGet,
 			path:     "/posts",
 			wantCode: http.StatusOK,
-			wantBody: `{"items":[{"id":0,"title":"H","sub_title":"S","body":"B","author":"Koo","category":1,"thumbnail":"w","createdAt":"1969-12-31T00:00:00Z","updatedAt":"1969-12-31T00:00:00Z"},{"id":1,"title":"H","sub_title":"S","body":"B","author":"Koo","category":0,"thumbnail":"w","createdAt":"1969-12-31T00:00:00Z","updatedAt":"1969-12-31T00:00:00Z"}]}`,
+			wantBody: fmt.Sprintf(`{"items":[%s,%s]}`, testPost1Json, testPost2Json),
 		},
 		"GET /posts?page_id=1": {
 			method:   http.MethodGet,
 			path:     "/posts?page_id=1",
 			wantCode: http.StatusOK,
-			wantBody: `{"items":[{"id":1,"title":"H","sub_title":"S","body":"B","author":"Koo","category":0,"thumbnail":"w","createdAt":"1969-12-31T00:00:00Z","updatedAt":"1969-12-31T00:00:00Z"}]}`,
+			wantBody: fmt.Sprintf(`{"items":[%s]}`, testPost2Json),
 		},
 		"GET /posts/{id} 200": {
 			method:   http.MethodGet,
 			path:     "/posts/0",
 			wantCode: http.StatusOK,
-			wantBody: `{"id":0,"title":"H","sub_title":"S","body":"B","author":"Koo","category":1,"thumbnail":"w","createdAt":"1969-12-31T00:00:00Z","updatedAt":"1969-12-31T00:00:00Z"}`,
+			wantBody: fmt.Sprintf(`%s`, testPost1Json),
 		},
 		"POST /posts 200": {
 			method: http.MethodPost,
 			path:   "/posts",
-			body:   `{"title":"Hello","sub_title":"S","body":"B","author":"Koo","category":0,"thumbnail":"w"}`,
-			header: map[string][]string{
+			body:   fmt.Sprintf(`%s`, newPostInJson),
+			header: http.Header{
 				"Content-type": {"application/json"},
 			},
 			wantCode: http.StatusOK,
-			wantBody: `{"id":3,"title":"Hello","sub_title":"S","body":"B","author":"Koo","category":0,"thumbnail":"w","createdAt":"0001-01-01T00:00:00Z","updatedAt":"0001-01-01T00:00:00Z"}`,
+			wantBody: fmt.Sprintf(`%s`, newPostResponseJson),
 		},
-		"PATCH /posts": {
+		"PATCH /posts/{id}": {
 			method: http.MethodPatch,
 			path:   "/posts/0",
-			body:   `{"sub_title":"Hello World"}`,
-			header: map[string][]string{
+			body:   fmt.Sprintf(`%s`, updatePostJson),
+			header: http.Header{
 				"Content-type": {"application/json"},
 			},
 			wantCode: http.StatusOK,
-			wantBody: `{"id":0,"title":"H","sub_title":"Hello World","body":"B","author":"Koo","category":1,"thumbnail":"w","createdAt":"1969-12-31T00:00:00Z","updatedAt":"1969-12-31T00:00:00Z"}`,
+			wantBody: fmt.Sprintf(`%s`, updatePostResponseJson),
 		},
 		"DELETE /posts": {
 			method: http.MethodDelete,
 			path:   "/posts/1",
-			header: map[string][]string{
+			header: http.Header{
 				"Content-type": {"application/json"},
 			},
 			wantCode: http.StatusOK,
@@ -111,8 +173,8 @@ func TestPostEndpoints(t *testing.T) {
 		"POST /posts 400": {
 			method: http.MethodPost,
 			path:   "/posts",
-			body:   `{"title":"","sub_title":"S","body":"B","author":"Koo","category":0,"thumbnail":"w"}`,
-			header: map[string][]string{
+			body:   fmt.Sprintf(`%s`, emptyTitlePostJson),
+			header: http.Header{
 				"Content-type": {"application/json"},
 			},
 			wantCode: http.StatusBadRequest,

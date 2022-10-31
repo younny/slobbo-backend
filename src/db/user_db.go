@@ -39,7 +39,7 @@ func (c *Client) CreateUser(user *types.User) error {
 }
 
 func (c *Client) UpdateUser(user *types.User) error {
-	return c.Client.Save(&user).Error
+	return c.Client.Where("id = ?", user.ID).Take(&types.User{}).UpdateColumns(&user).Error
 }
 
 func (c *Client) DeleteUser(id uint) error {

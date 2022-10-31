@@ -134,7 +134,7 @@ func TestWorkshopEndpoints(t *testing.T) {
 			method: http.MethodPost,
 			path:   "/workshops",
 			body:   fmt.Sprintf(`%s`, newWorkshopRequestJson),
-			header: map[string][]string{
+			header: http.Header{
 				"Content-type": {"application/json"},
 			},
 			wantCode: http.StatusOK,
@@ -144,7 +144,7 @@ func TestWorkshopEndpoints(t *testing.T) {
 			method: http.MethodPatch,
 			path:   "/workshops/0",
 			body:   `{"name":"Hello World"}`,
-			header: map[string][]string{
+			header: http.Header{
 				"Content-type": {"application/json"},
 			},
 			wantCode: http.StatusOK,
@@ -153,7 +153,7 @@ func TestWorkshopEndpoints(t *testing.T) {
 		"DELETE /workshops": {
 			method: http.MethodDelete,
 			path:   "/workshops/1",
-			header: map[string][]string{
+			header: http.Header{
 				"Content-type": {"application/json"},
 			},
 			wantCode: http.StatusOK,
@@ -167,7 +167,7 @@ func TestWorkshopEndpoints(t *testing.T) {
 			method: http.MethodPost,
 			path:   "/workshops",
 			body:   `{"title":"","sub_title":"S","body":"B","author":"Koo","category":0,"thumbnail":"w"}`,
-			header: map[string][]string{
+			header: http.Header{
 				"Content-type": {"application/json"},
 			},
 			wantCode: http.StatusBadRequest,

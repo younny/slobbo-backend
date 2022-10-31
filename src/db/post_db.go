@@ -27,7 +27,7 @@ func (c *Client) CreatePost(post *types.Post) error {
 }
 
 func (c *Client) UpdatePost(post *types.Post) error {
-	return c.Client.Save(&post).Error
+	return c.Client.Where("id = ?", post.ID).Take(&types.Post{}).UpdateColumns(&post).Error
 }
 
 func (c *Client) DeletePost(id uint) error {

@@ -10,10 +10,11 @@ import (
 
 func Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, err := auth.ExtractTokenID(r)
+		err := auth.TokenValid(r)
 		if err != nil {
 			_ = render.Render(w, r, types.ErrNotAuthorised(err))
 			return
 		}
+		next.ServeHTTP(w, r)
 	})
 }

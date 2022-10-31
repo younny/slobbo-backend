@@ -1,6 +1,7 @@
 package operations
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/go-chi/render"
@@ -52,7 +53,7 @@ func (server *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) UpdateUser(w http.ResponseWriter, r *http.Request) {
-	user := &types.User{}
+	user := r.Context().Value(m.UserCtxKey).(*types.User)
 
 	if err := render.Bind(r, user); err != nil {
 		_ = render.Render(w, r, types.ErrInvalidRequst(err))
@@ -66,11 +67,9 @@ func (server *Server) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if tokenID != uint32(user.ID) {
-		_ = render.Render(w, r, types.ErrNotAuthorised(err))
+		_ = render.Render(w, r, types.ErrNotAuthorised(errors.New("Not allowed.")))
 		return
 	}
-
-	user.Prepare()
 
 	if err := user.Validate(""); err != nil {
 		_ = render.Render(w, r, types.ErrInvalidRequst(err))
@@ -98,7 +97,7 @@ func (server *Server) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if tokenID != uint32(user.ID) {
-		_ = render.Render(w, r, types.ErrNotAuthorised(err))
+		_ = render.Render(w, r, types.ErrNotAuthorised(errors.New("Not allowed.")))
 		return
 	}
 

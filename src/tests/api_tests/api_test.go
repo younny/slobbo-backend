@@ -38,6 +38,26 @@ func TestGetRouter(t *testing.T) {
 		method string
 		path   string
 	}{
+		"GET /users": {
+			method: http.MethodGet,
+			path:   "/users",
+		},
+		"GET /users/{id}": {
+			method: http.MethodGet,
+			path:   "/users/id",
+		},
+		"POST /users": {
+			method: http.MethodPost,
+			path:   "/users",
+		},
+		"PATCH /users": {
+			method: http.MethodPatch,
+			path:   "/users",
+		},
+		"DELETE /users": {
+			method: http.MethodDelete,
+			path:   "/users",
+		},
 		"GET /about": {
 			method: http.MethodGet,
 			path:   "/about",
