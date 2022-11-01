@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -14,11 +15,21 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/younny/slobbo-backend/src/api/operations"
+	"github.com/younny/slobbo-backend/src/types"
 )
 
 var (
 	randomTime       = time.Date(1970, 1, 0, 0, 0, 0, 0, time.UTC)
 	createdTime, err = time.Parse(time.RFC3339, "0001-01-01T00:00:00Z")
+	testUser         = types.User{
+		ID:        1,
+		Username:  "yuna",
+		Email:     "abc@slobbo.com",
+		Password:  "1234",
+		Role:      "admin",
+		CreatedAt: randomTime,
+		UpdatedAt: randomTime,
+	}
 )
 
 type TestCase struct {
@@ -143,4 +154,14 @@ func RequestHandler(t *testing.T, ts *httptest.Server, method, path string, body
 	respBody = bytes.TrimSpace(respBody)
 	return resp, string(respBody)
 
+}
+
+func Authenticate(s operations.Server) string {
+	token, err := s.SignIn(testUser.Email, testUser.Password)
+	if err != nil {
+		log.Fatalf("cannot login: %v\n", err)
+	}
+	tokenStr := fmt.Sprintf("Bearer %v", token)
+
+	return tokenStr
 }

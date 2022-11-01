@@ -101,6 +101,8 @@ func TestWorkshopEndpoints(t *testing.T) {
 	ts := httptest.NewServer(s.Router)
 	defer ts.Close()
 
+	tokenStr := Authenticate(s)
+
 	testcasesInOrder := []string{
 		"GET /workshops",
 		"GET /workshops?page_id=1",
@@ -135,7 +137,8 @@ func TestWorkshopEndpoints(t *testing.T) {
 			path:   "/workshops",
 			body:   fmt.Sprintf(`%s`, newWorkshopRequestJson),
 			header: http.Header{
-				"Content-type": {"application/json"},
+				"Content-type":  {"application/json"},
+				"Authorization": {tokenStr},
 			},
 			wantCode: http.StatusOK,
 			wantBody: fmt.Sprintf(`%s`, newWorkshopResponseJson),
@@ -145,7 +148,8 @@ func TestWorkshopEndpoints(t *testing.T) {
 			path:   "/workshops/0",
 			body:   `{"name":"Hello World"}`,
 			header: http.Header{
-				"Content-type": {"application/json"},
+				"Content-type":  {"application/json"},
+				"Authorization": {tokenStr},
 			},
 			wantCode: http.StatusOK,
 			wantBody: fmt.Sprintf(`%s`, updatedWorkshopResponseJson),
@@ -154,7 +158,8 @@ func TestWorkshopEndpoints(t *testing.T) {
 			method: http.MethodDelete,
 			path:   "/workshops/1",
 			header: http.Header{
-				"Content-type": {"application/json"},
+				"Content-type":  {"application/json"},
+				"Authorization": {tokenStr},
 			},
 			wantCode: http.StatusOK,
 		},
@@ -168,7 +173,8 @@ func TestWorkshopEndpoints(t *testing.T) {
 			path:   "/workshops",
 			body:   `{"title":"","sub_title":"S","body":"B","author":"Koo","category":0,"thumbnail":"w"}`,
 			header: http.Header{
-				"Content-type": {"application/json"},
+				"Content-type":  {"application/json"},
+				"Authorization": {tokenStr},
 			},
 			wantCode: http.StatusBadRequest,
 		},
@@ -217,6 +223,8 @@ func getWorkshopDBClientMock(t *testing.T) *mocks.MockClientInterface {
 	dbClient.EXPECT().UpdateWorkshop(gomock.Any()).AnyTimes()
 
 	dbClient.EXPECT().DeleteWorkshop(gomock.Eq(uint(1))).AnyTimes()
+
+	dbClient.EXPECT().GetUserByEmail(gomock.Any()).Return(&testUser).AnyTimes()
 
 	return dbClient
 }

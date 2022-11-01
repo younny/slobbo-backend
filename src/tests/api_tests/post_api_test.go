@@ -108,6 +108,8 @@ func TestPostEndpoints(t *testing.T) {
 	ts := httptest.NewServer(s.Router)
 	defer ts.Close()
 
+	tokenStr := Authenticate(s)
+
 	testcasesInOrder := []string{
 		"GET /posts",
 		"GET /posts?page_id=1",
@@ -142,7 +144,8 @@ func TestPostEndpoints(t *testing.T) {
 			path:   "/posts",
 			body:   fmt.Sprintf(`%s`, newPostInJson),
 			header: http.Header{
-				"Content-type": {"application/json"},
+				"Content-type":  {"application/json"},
+				"Authorization": {tokenStr},
 			},
 			wantCode: http.StatusOK,
 			wantBody: fmt.Sprintf(`%s`, newPostResponseJson),
@@ -152,7 +155,8 @@ func TestPostEndpoints(t *testing.T) {
 			path:   "/posts/0",
 			body:   fmt.Sprintf(`%s`, updatePostJson),
 			header: http.Header{
-				"Content-type": {"application/json"},
+				"Content-type":  {"application/json"},
+				"Authorization": {tokenStr},
 			},
 			wantCode: http.StatusOK,
 			wantBody: fmt.Sprintf(`%s`, updatePostResponseJson),
@@ -161,7 +165,8 @@ func TestPostEndpoints(t *testing.T) {
 			method: http.MethodDelete,
 			path:   "/posts/1",
 			header: http.Header{
-				"Content-type": {"application/json"},
+				"Content-type":  {"application/json"},
+				"Authorization": {tokenStr},
 			},
 			wantCode: http.StatusOK,
 		},
@@ -175,7 +180,8 @@ func TestPostEndpoints(t *testing.T) {
 			path:   "/posts",
 			body:   fmt.Sprintf(`%s`, emptyTitlePostJson),
 			header: http.Header{
-				"Content-type": {"application/json"},
+				"Content-type":  {"application/json"},
+				"Authorization": {tokenStr},
 			},
 			wantCode: http.StatusBadRequest,
 		},
@@ -220,6 +226,8 @@ func getPostDBClientMock(t *testing.T) *mocks.MockClientInterface {
 		post.ID = 3
 		return nil
 	}).AnyTimes()
+
+	dbClient.EXPECT().GetUserByEmail(gomock.Any()).Return(&testUser).Times(1)
 
 	dbClient.EXPECT().UpdatePost(gomock.Any()).AnyTimes()
 

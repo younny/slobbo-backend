@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -17,15 +16,6 @@ import (
 )
 
 var (
-	testUser = types.User{
-		ID:        1,
-		Username:  "Oskar",
-		Email:     "abc@example.com",
-		Password:  "Slobbodibo",
-		CreatedAt: randomTime,
-		UpdatedAt: randomTime,
-	}
-
 	newUserRequest = types.User{
 		Username: "Tester 2",
 		Email:    "tester2@test.com",
@@ -51,6 +41,7 @@ var (
 		Username: "Foo",
 		Password: "abcdefg",
 		Email:    "tester@test.com",
+		Role:     "admin",
 	}
 
 	updateUserResponse = types.User{
@@ -58,6 +49,7 @@ var (
 		Username:  "Foo",
 		Email:     "tester@test.com",
 		Password:  "abcdefg",
+		Role:      "admin",
 		CreatedAt: createdTime,
 		UpdatedAt: createdTime,
 	}
@@ -77,11 +69,7 @@ func TestUserEndpoints(t *testing.T) {
 	ts := httptest.NewServer(s.Router)
 	defer ts.Close()
 
-	token, err := s.SignIn(testUser.Email, testUser.Password)
-	if err != nil {
-		log.Fatalf("cannot login: %v\n", err)
-	}
-	tokenStr := fmt.Sprintf("Bearer %v", token)
+	tokenStr := Authenticate(s)
 
 	testcasesInOrder := []string{
 		"GET /users",
@@ -97,20 +85,29 @@ func TestUserEndpoints(t *testing.T) {
 
 	testcases := map[string]TestCase{
 		"GET /users": {
-			method:   http.MethodGet,
-			path:     "/users",
+			method: http.MethodGet,
+			path:   "/users",
+			header: http.Header{
+				"Authorization": {tokenStr},
+			},
 			wantCode: http.StatusOK,
 			wantBody: fmt.Sprintf(`{"items":[%s]}`, testUserInJson),
 		},
 		"GET /users/{id} 200": {
-			method:   http.MethodGet,
-			path:     "/users/1",
+			method: http.MethodGet,
+			path:   "/users/1",
+			header: http.Header{
+				"Authorization": {tokenStr},
+			},
 			wantCode: http.StatusOK,
 			wantBody: fmt.Sprintf(`%s`, testUserInJson),
 		},
 		"GET /users/{id} 404": {
-			method:   http.MethodGet,
-			path:     "/users/2",
+			method: http.MethodGet,
+			path:   "/users/2",
+			header: http.Header{
+				"Authorization": {tokenStr},
+			},
 			wantCode: http.StatusNotFound,
 		},
 		"POST /users 200": {
@@ -118,7 +115,8 @@ func TestUserEndpoints(t *testing.T) {
 			path:   "/users",
 			body:   fmt.Sprintf(`%s`, newUserRequestInJson),
 			header: http.Header{
-				"Content-type": {"application/json"},
+				"Content-type":  {"application/json"},
+				"Authorization": {tokenStr},
 			},
 			wantCode: http.StatusOK,
 			wantBody: fmt.Sprintf(`%s`, newUserResponseInJson),
@@ -128,7 +126,8 @@ func TestUserEndpoints(t *testing.T) {
 			path:   "/users",
 			body:   fmt.Sprintf(`%s`, newUserRequest2InJson),
 			header: http.Header{
-				"Content-type": {"application/json"},
+				"Content-type":  {"application/json"},
+				"Authorization": {tokenStr},
 			},
 			wantCode: http.StatusBadRequest,
 		},

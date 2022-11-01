@@ -62,6 +62,8 @@ func TestAboutEndpoints(t *testing.T) {
 	ts := httptest.NewServer(s.Router)
 	defer ts.Close()
 
+	tokenStr := Authenticate(s)
+
 	testcasesInOrder := []string{
 		"GET /about",
 		"PATCH /about",
@@ -77,7 +79,8 @@ func TestAboutEndpoints(t *testing.T) {
 			method: http.MethodPatch,
 			path:   "/about",
 			header: http.Header{
-				"Content-type": {"application/json"},
+				"Content-type":  {"application/json"},
+				"Authorization": {tokenStr},
 			},
 			body:     fmt.Sprintf(`%s`, updateTestAboutInJson),
 			wantCode: http.StatusOK,
@@ -103,6 +106,8 @@ func getAboutDBClientMock(t *testing.T) *mocks.MockClientInterface {
 	dbClient := mocks.NewMockClientInterface(ctrl)
 
 	dbClient.EXPECT().GetAbout().Return(&testAbout).Times(2)
+
+	dbClient.EXPECT().GetUserByEmail(gomock.Any()).Return(&testUser).Times(1)
 
 	dbClient.EXPECT().UpdateAbout(gomock.Any()).AnyTimes()
 	return dbClient
