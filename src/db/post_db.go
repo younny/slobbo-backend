@@ -15,7 +15,7 @@ func (c *Client) GetPosts(pageID int) *types.PostList {
 func (c *Client) GetPostByID(id uint) *types.Post {
 	post := &types.Post{}
 
-	if err := c.Client.Where("id = ?", id).First(&post).Scan(post).Error; err != nil {
+	if err := c.Client.Where("id = ?", id).First(post).Scan(post).Error; err != nil {
 		return nil
 	}
 
@@ -32,7 +32,7 @@ func (c *Client) UpdatePost(post *types.Post) error {
 
 func (c *Client) DeletePost(id uint) error {
 	post := &types.Post{}
-	if err := c.Client.Where("id = ?", id).First(&post).Error; err != nil {
+	if err := c.Client.Where("id = ?", id).First(post).Error; err != nil {
 		return err
 	}
 

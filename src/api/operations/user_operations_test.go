@@ -1,4 +1,4 @@
-package api_tests
+package operations
 
 import (
 	"bytes"
@@ -11,7 +11,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/younny/slobbo-backend/src/api/mocks"
-	"github.com/younny/slobbo-backend/src/api/operations"
 	"github.com/younny/slobbo-backend/src/types"
 )
 
@@ -63,7 +62,7 @@ var (
 )
 
 func TestUserEndpoints(t *testing.T) {
-	s := operations.Server{}
+	s := Server{}
 	s.Set(getUserDBClientMock(t))
 
 	ts := httptest.NewServer(s.Router)
@@ -79,6 +78,7 @@ func TestUserEndpoints(t *testing.T) {
 		"POST /users 400",
 		"PATCH /users/{id} 200",
 		"PATCH /users/{id} 400",
+		"DELETE /users/{id} 401",
 		"DELETE /users/{id} 200",
 		"DELETE /users/{id} 400",
 	}
@@ -151,6 +151,11 @@ func TestUserEndpoints(t *testing.T) {
 				"Authorization": {tokenStr},
 			},
 			wantCode: http.StatusNotFound,
+		},
+		"DELETE /users/{id} 401": {
+			method:   http.MethodDelete,
+			path:     "/users/1",
+			wantCode: http.StatusUnauthorized,
 		},
 		"DELETE /users/{id} 200": {
 			method: http.MethodDelete,

@@ -10,18 +10,18 @@ func (s *Server) initializeRoutes() {
 		r.Post("/", s.Login)
 	})
 	s.Router.Route("/users", func(r chi.Router) {
-		r.Use(m.Auth)
 		r.Get("/", s.GetUsers)
 		r.Post("/", s.CreateUser)
 		r.Route("/{id}", func(r chi.Router) {
 			r.Use(m.User)
 			r.Get("/", GetUserByID)
-			r.Patch("/", s.UpdateUser)
-			r.Delete("/", s.DeleteUser)
+			r.With(m.Auth).Patch("/", s.UpdateUser)
+			r.With(m.Auth).Delete("/", s.DeleteUser)
 		})
 	})
 	s.Router.Route("/about", func(r chi.Router) {
 		r.Get("/", s.GetAbout)
+		r.With(m.Auth).Post("/", s.CreateAbout)
 		r.With(m.Auth).Patch("/", s.UpdateAbout)
 	})
 	s.Router.Route("/workshops", func(r chi.Router) {

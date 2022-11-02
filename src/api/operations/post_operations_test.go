@@ -1,4 +1,4 @@
-package api_tests
+package operations
 
 import (
 	"bytes"
@@ -12,7 +12,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/younny/slobbo-backend/src/api/mocks"
-	"github.com/younny/slobbo-backend/src/api/operations"
 	"github.com/younny/slobbo-backend/src/types"
 )
 
@@ -102,7 +101,7 @@ var (
 )
 
 func TestPostEndpoints(t *testing.T) {
-	s := operations.Server{}
+	s := Server{}
 	s.Set(getPostDBClientMock(t))
 
 	ts := httptest.NewServer(s.Router)
@@ -117,6 +116,7 @@ func TestPostEndpoints(t *testing.T) {
 		"POST /posts 200",
 		"PATCH /posts/{id}",
 		"DELETE /posts",
+		"DELETE /post 404",
 		"GET /posts/{id} 404",
 		"POST /posts 400",
 	}
@@ -169,6 +169,15 @@ func TestPostEndpoints(t *testing.T) {
 				"Authorization": {tokenStr},
 			},
 			wantCode: http.StatusOK,
+		},
+		"DELETE /post 404": {
+			method: http.MethodDelete,
+			path:   "/posts/3",
+			header: http.Header{
+				"Content-type":  {"application/json"},
+				"Authorization": {tokenStr},
+			},
+			wantCode: http.StatusNotFound,
 		},
 		"GET /posts/{id} 404": {
 			method:   http.MethodGet,
@@ -231,7 +240,7 @@ func getPostDBClientMock(t *testing.T) *mocks.MockClientInterface {
 
 	dbClient.EXPECT().UpdatePost(gomock.Any()).AnyTimes()
 
-	dbClient.EXPECT().DeletePost(gomock.Eq(uint(1))).AnyTimes()
+	dbClient.EXPECT().DeletePost(gomock.Any()).AnyTimes()
 
 	return dbClient
 }

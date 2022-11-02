@@ -26,6 +26,7 @@ type ClientInterface interface {
 	DeleteUser(id uint) error
 
 	GetAbout() *types.About
+	CreateAbout(about *types.About) error
 	UpdateAbout(about *types.About) error
 
 	GetPosts(pageID int) *types.PostList

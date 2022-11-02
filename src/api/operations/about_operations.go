@@ -14,6 +14,25 @@ func (server *Server) GetAbout(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (server *Server) CreateAbout(w http.ResponseWriter, r *http.Request) {
+	about := &types.About{}
+
+	if err := render.Bind(r, about); err != nil {
+		_ = render.Render(w, r, types.ErrInvalidRequst(err))
+		return
+	}
+
+	if err := server.DB.CreateAbout(about); err != nil {
+		_ = render.Render(w, r, types.ErrInvalidRequst(err))
+		return
+	}
+
+	if err := render.Render(w, r, about); err != nil {
+		_ = render.Render(w, r, types.ErrRender(err))
+		return
+	}
+}
+
 func (server *Server) UpdateAbout(w http.ResponseWriter, r *http.Request) {
 	about := server.DB.GetAbout()
 	if about == nil {

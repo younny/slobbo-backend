@@ -1,4 +1,4 @@
-package api_tests
+package operations
 
 import (
 	"bytes"
@@ -12,7 +12,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/younny/slobbo-backend/src/api/mocks"
-	"github.com/younny/slobbo-backend/src/api/operations"
 	"github.com/younny/slobbo-backend/src/types"
 )
 
@@ -95,7 +94,7 @@ var (
 )
 
 func TestWorkshopEndpoints(t *testing.T) {
-	s := operations.Server{}
+	s := Server{}
 	s.Set(getWorkshopDBClientMock(t))
 
 	ts := httptest.NewServer(s.Router)

@@ -27,6 +27,9 @@ func (server *Server) Login(w http.ResponseWriter, r *http.Request) {
 	token, err := server.SignIn(user.Email, user.Password)
 
 	if err != nil {
+		if err.Error() == "UserNotFound" {
+			_ = render.Render(w, r, types.ErrNotFound())
+		}
 		_ = render.Render(w, r, types.ErrInvalidRequst(err))
 		return
 	}
@@ -38,7 +41,7 @@ func (server *Server) SignIn(email, password string) (string, error) {
 	user := server.DB.GetUserByEmail(email)
 
 	if user == nil {
-		return "", errors.New("User not found")
+		return "", errors.New("UserNotFound")
 	}
 
 	if err := types.VerifyPassword(user.Password, password); err != nil && err == bcrypt.ErrMismatchedHashAndPassword {

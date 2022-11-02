@@ -207,6 +207,18 @@ func (mr *MockClientInterfaceMockRecorder) GetAbout() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAbout", reflect.TypeOf((*MockClientInterface)(nil).GetAbout))
 }
 
+func (m *MockClientInterface) CreateAbout(arg0 *types.About) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateAbout", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (mr *MockClientInterfaceMockRecorder) CreateAbout(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAbout", reflect.TypeOf((*MockClientInterface)(nil).CreateAbout), arg0)
+}
+
 func (m *MockClientInterface) UpdateAbout(arg0 *types.About) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateAbout", arg0)

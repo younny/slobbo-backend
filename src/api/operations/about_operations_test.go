@@ -1,4 +1,4 @@
-package api_tests
+package operations
 
 import (
 	"bytes"
@@ -12,7 +12,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/younny/slobbo-backend/src/api/mocks"
-	"github.com/younny/slobbo-backend/src/api/operations"
 	"github.com/younny/slobbo-backend/src/types"
 )
 
@@ -56,7 +55,7 @@ var (
 )
 
 func TestAboutEndpoints(t *testing.T) {
-	s := operations.Server{}
+	s := Server{}
 	s.Set(getAboutDBClientMock(t))
 
 	ts := httptest.NewServer(s.Router)
@@ -65,10 +64,22 @@ func TestAboutEndpoints(t *testing.T) {
 	tokenStr := Authenticate(s)
 
 	testcasesInOrder := []string{
+		"CREATE /about",
 		"GET /about",
 		"PATCH /about",
 	}
 	testcases := map[string]TestCase{
+		"CREATE /about": {
+			method: http.MethodPost,
+			path:   "/about",
+			header: http.Header{
+				"Content-type":  {"application/json"},
+				"Authorization": {tokenStr},
+			},
+			body:     fmt.Sprintf(`%s`, testAboutInJson),
+			wantCode: http.StatusOK,
+			wantBody: fmt.Sprintf(`%s`, testAboutInJson),
+		},
 		"GET /about": {
 			method:   http.MethodGet,
 			path:     "/about",
@@ -104,6 +115,8 @@ func TestAboutEndpoints(t *testing.T) {
 func getAboutDBClientMock(t *testing.T) *mocks.MockClientInterface {
 	ctrl := gomock.NewController(t)
 	dbClient := mocks.NewMockClientInterface(ctrl)
+
+	dbClient.EXPECT().CreateAbout(gomock.Any()).Times(1)
 
 	dbClient.EXPECT().GetAbout().Return(&testAbout).Times(2)
 

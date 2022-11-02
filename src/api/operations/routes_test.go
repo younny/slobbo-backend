@@ -1,4 +1,4 @@
-package api_tests
+package operations
 
 import (
 	"bytes"
@@ -14,7 +14,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/younny/slobbo-backend/src/api/operations"
 	"github.com/younny/slobbo-backend/src/types"
 )
 
@@ -42,7 +41,7 @@ type TestCase struct {
 }
 
 func TestGetRouter(t *testing.T) {
-	server := operations.Server{}
+	server := Server{}
 	server.Set(nil)
 	r := server.Router
 	testcases := map[string]struct {
@@ -156,7 +155,7 @@ func RequestHandler(t *testing.T, ts *httptest.Server, method, path string, body
 
 }
 
-func Authenticate(s operations.Server) string {
+func Authenticate(s Server) string {
 	token, err := s.SignIn(testUser.Email, testUser.Password)
 	if err != nil {
 		log.Fatalf("cannot login: %v\n", err)

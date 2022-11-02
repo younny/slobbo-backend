@@ -18,7 +18,7 @@ func (c *Client) GetWorkshops(pageID int) *types.WorkshopList {
 func (c *Client) GetWorkshopByID(id uint) *types.Workshop {
 	workshop := &types.Workshop{}
 
-	if err := c.Client.Where("id = ?", id).First(&workshop).Scan(&workshop).Error; err != nil {
+	if err := c.Client.Where("id = ?", id).First(workshop).Scan(workshop).Error; err != nil {
 		return nil
 	}
 
@@ -35,7 +35,7 @@ func (c *Client) UpdateWorkshop(workshop *types.Workshop) error {
 
 func (c *Client) DeleteWorkshop(id uint) error {
 	workshop := &types.Workshop{}
-	if err := c.Client.Where("id == ?", id).First(&workshop).Error; err != nil {
+	if err := c.Client.Where("id = ?", id).Take(&workshop).Error; err != nil {
 		return err
 	}
 

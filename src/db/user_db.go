@@ -27,7 +27,7 @@ func (c *Client) GetUserByID(id uint) *types.User {
 func (c *Client) GetUserByEmail(email string) *types.User {
 	user := &types.User{}
 
-	if err := c.Client.Where("email = ?", email).Take(&user).Error; err != nil {
+	if err := c.Client.Where("email = ?", email).Take(&user).Omit("Password").Error; err != nil {
 		return nil
 	}
 
@@ -46,7 +46,7 @@ func (c *Client) DeleteUser(id uint) error {
 	user := &types.User{}
 
 	if err := c.Client.Where("id = ?", id).Take(&user).Error; err != nil {
-		return nil
+		return err
 	}
 
 	return c.Client.Delete(&user).Error

@@ -1,6 +1,6 @@
-FROM golang:alpine
+FROM golang:alpine as builder
 
-LABEL maintainer="Slobbo"
+LABEL maintainer="Slobbo <slobbodibo@gmail.com>"
 
 # Install git - required for fetching dependencies.
 RUN apk update && apk add --no-cache git && apk add --no-cach bash && apk add build-base
@@ -9,18 +9,23 @@ RUN apk update && apk add --no-cache git && apk add --no-cach bash && apk add bu
 RUN mkdir /app
 WORKDIR /app
 
+COPY go.mod go.sum ./
+
+RUN go mod download
+
 COPY . .
-COPY .env .
 
-# Download dependencies
-RUN go get -d -v ./...
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 
-# Install the package
-RUN go install -v ./...
+# Start a new stage from scratch
+FROM alpine:latest
+RUN apk --no-cache add ca-certificates
 
-# Build the Go app
-RUN go build -o /build
+WORKDIR /root/
+COPY --from=builder /app/main .
+COPY --from=builder /app/.env .   
+
 
 EXPOSE 8080
 
-CMD ["/build"]
+CMD ["./main"]

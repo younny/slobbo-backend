@@ -28,12 +28,16 @@ func init() {
 	}
 }
 
+func getUri() string {
+	return fmt.Sprintf("host=%s port=%s sslmode=disable user=%s dbname=%s password=%s",
+		os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_USER"), os.Getenv("DB_NAME"), os.Getenv("DB_PASSWORD"))
+}
+
 func Run() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
-	dbUri := fmt.Sprintf("host=%s port=%s sslmode=disable user=%s dbname=%s password=%s",
-		os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_USER"), os.Getenv("DB_NAME"), os.Getenv("DB_PASSWORD"))
+	dbUri := getUri()
 
 	server.Initialize(dbUri)
 
