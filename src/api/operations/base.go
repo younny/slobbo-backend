@@ -48,11 +48,12 @@ func (server *Server) Set(dbClient db.ClientInterface) {
 func getRouter() *chi.Mux {
 	r := chi.NewRouter()
 
-	r.Use(middleware.RequestID)
-	r.Use(middleware.Recoverer)
-	r.Use(middleware.RealIP)
-	r.Use(middleware.Logger)
-	r.Use(middleware.Timeout(60 * time.Second))
+	r.Use(middleware.RequestID,
+		middleware.Recoverer,
+		middleware.RealIP,
+		middleware.Logger,
+		middleware.Timeout(60*time.Second),
+	)
 
 	return r
 }
