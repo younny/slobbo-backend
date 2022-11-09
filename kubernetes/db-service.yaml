@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: slobbo-api
+  namespace: slobbo
+  labels:
+    app: slobbo-backend
+spec:
+  ports:
+    - name: db
+      port: 5432
+      targetPort: 5432
+  selector:
+    app: slobbo-backend
+    tier: postgres

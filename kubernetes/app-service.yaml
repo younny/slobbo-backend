@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: slobbo-backend-service
+  namespace: slobbo
+  labels:
+    app: slobbo-backend
+spec:
+  selector:
+    app: slobbo-backend
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080

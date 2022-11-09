@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: slobbo-backend-deployment
+  namespace: slobbo
+  labels:
+    app: slobbo-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: slobbo-backend
+  template:
+    metadata:
+      labels:
+        app: slobbo-backend
+    spec:
+      containers:
+      - name: slobbo-backend
+        image: slobbo/slobbo-api:1.0.0
+        imagePullPolicy: IfNotPresent
+        resources:                                # Best practice to specify resources for our application to prevent unintended consequences of rapid scaling.
+          limits:                                 # kubelet enforces limits so that the running container is not allowed to use more of that resource than the limit set
+            cpu: 900m
+          requests:                               # the scheduler uses this information to decide which node to place the Pod on
+            cpu: 500m     
+        ports:
+          - name: http
+            containerPort: 8080
+        envFrom:
+          - secretRef:
+              name: postgres-secret

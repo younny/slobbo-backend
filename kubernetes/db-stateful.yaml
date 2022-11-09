@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: slobbo-db-stateful
+  namespace: slobbo
+spec:
+  serviceName: slobbo-db-service
+  selector:
+    matchLabels:
+      app: slobbo-backend
+      tier: postgres
+  replicas: 1
+  template:
+    metadata:
+      namespace: slobbo
+      labels:
+        app: slobbo-backend
+        tier: postgres
+    spec:
+      containers:
+        - image: postgres:latest
+          name: postgres
+          imagePullPolicy: "IfNotPresent"
+          envFrom:
+            - secretRef:
+                name: postgres-secret
+          ports:
+            - containerPort: 5432
+              name: postgres
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-persistent-storage
+      volumes:
+        - name: postgres-persistent-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc
