@@ -1,2 +1,3 @@
 slobbo_data/*
+*secret.yaml
 .env
