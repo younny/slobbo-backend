@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/younny/slobbo-backend/src/api"
 	l "github.com/younny/slobbo-backend/src/log"
 )
@@ -11,7 +13,8 @@ var (
 )
 
 func main() {
+	env := os.Args[1:][0]
 	l.SetLogger()
 
-	api.Run()
+	api.Run(env)
 }

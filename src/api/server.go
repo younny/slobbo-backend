@@ -28,16 +28,27 @@ func init() {
 	}
 }
 
-func getUri() string {
+func getDevUri() string {
+	return fmt.Sprintf("host=localhost port=%s sslmode=disable user=postgres dbname=%s password=%s",
+		os.Getenv("DB_PORT"), os.Getenv("DB_NAME"), os.Getenv("DB_PASSWORD"))
+}
+
+func getProdUri() string {
 	return fmt.Sprintf("host=%s port=%s sslmode=disable user=%s dbname=%s password=%s",
 		os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_USER"), os.Getenv("DB_NAME"), os.Getenv("DB_PASSWORD"))
 }
 
-func Run() {
+func Run(env string) {
+	l.Log.Info("Environemnt selected: " + env)
+
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-
-	dbUri := getUri()
+	var dbUri string
+	if env == "dev" {
+		dbUri = getDevUri()
+	} else {
+		dbUri = getProdUri()
+	}
 
 	server.Initialize(dbUri)
 
