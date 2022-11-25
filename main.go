@@ -13,8 +13,10 @@ var (
 )
 
 func main() {
-	env := os.Args[1:][0]
+	env := "prod"
+	if len(os.Args) > 1 {
+		env = os.Args[1:][0]
+	}
 	l.SetLogger()
-
 	api.Run(env)
 }
