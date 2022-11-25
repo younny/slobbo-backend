@@ -29,6 +29,7 @@ func (server *Server) Login(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if err.Error() == "UserNotFound" {
 			_ = render.Render(w, r, types.ErrNotFound())
+			return
 		}
 		_ = render.Render(w, r, types.ErrInvalidRequst(err))
 		return
